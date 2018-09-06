@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>挖宝网</title>
+		<link rel="stylesheet" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../css/ext.css" />
+	</head>
+	<body>
+	<div class="container">
+	<div class="row box" style="margin-top: 2rem; margin-bottom: 2rem;">
+		<div class="col-md-2 column">
+			<!-- 修改bootstrap中h1的margin-->
+			<h1 style="color: red; margin: auto;">挖宝网</h1>
+		</div>
+		<div class="col-md-6 column">
+			<form role="form" class="form-inline">
+				<div class="form-group">
+					 <input type="text" id="txtSearch" size="60" class="form-control" id="search" placeholder="搜一下"/>
+					 <input type="button" id="btnSearch" class="btn btn-primary" value="搜索"/>
+				</div>
+			</form>
+		</div>
+		<div class="col-md-1 column" align="right">
+			<span id="showUser" class="badge pull-right">未登入</span>
+		</div>
+		<div class="col-md-2 column" align="right">
+			<a id="carthref" href="#"><span id="CountMessage" class="badge pull-right">0</span>我的购物车</a>
+		</div>
+		<div class="col-md-1 column" align="right">
+			<a href="#" id="loginhref">登陆</a>/<a href="#" id="reghref">注册</a>
+		</div>
+	</div>
+		<!-- 商品列表 -->
+	<div class="row">
+		<div class="col-md-2 column">
+			<ul id="ul_Type" class="nav navcolor nav-pills nav-stacked">
+				<li class="active">
+					 <a href="#">分类</a>
+				</li>
+			</ul>
+		</div>
+		<div class="col-md-10 column">
+			<div id="showProduct" class="row"></div>
+		</div>
+	</div>
+	<!-- 模态框 -->
+	<div id="modal"></div>
+    </div>
+	</body>
+	<script src="../js/jquery-3.3.1.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script src="../js/operation.js"></script>
+	<script>
+
+		//登入注册弹框
+		$(function(){
+			$("#loginhref").on("click",function(){
+				$("#modal").load("login.html",function(){
+					$('#loginModal').modal('show');
+						$("#btnLogin").on("click",function () {  //登入点击事件
+                            loginVerify($("#user_id").val(),$("#user_pwd").val()); //数据验证
+						});
+				});
+			});
+			$("#reghref").on("click",function(){
+				$("#modal").load("reg.html",function(){
+					$('#regModal').modal('show');
+                    $("#btnRegister").on("click",function () {  //注册点击事件
+                        registerUser($("#user_id").val(),$("#user_pwd").val(),$("#user_phone").val(),$("#user_email").val());
+                    });
+				});
+			});
+
+		});
+
+
+		//注册方法
+		function registerUser(user_id,user_pwd,user_phone,user_email){
+            $.ajax({
+                type:"post",
+                data:{"action":"register","user_id":user_id,"user_pwd":user_pwd,
+						"user_phone":user_phone,"user_email":user_email
+				},
+                url:"/userServlet",
+                success:function (data) {
+                    $("#showUser").text(data.msg);
+                    alert("恭喜您注册成功！已为您自动登入");
+                    $('#regModal').modal('hide'); //关闭
+                },
+                error:function (xhl) {
+                    console.log(xhl);
+                }
+            });
+		}
+
+
+
+		//登入验证方法
+		function loginVerify(id,pwd){
+		    // userServlet?action=verify&user_id=ldl&user_pwd=123
+            $.ajax({
+				type:"post",
+				data:{"action":"verify","user_id":id,"user_pwd":pwd},
+				url:"/userServlet",
+				success:function (data) {
+					$("#showUser").text(data.msg);
+                    ShoppingCart_count();
+                    $('#loginModal').modal('hide');
+                },
+				error:function (xhl) {
+					console.log(xhl);
+                }
+            });
+		}
+
+
+		//分类导航加载
+		$(function () {
+			startLeftNvaQuery();   //商品类型渲染
+            startProductQuery();  //商品数据渲染
+			left_nva_a_click();  //类型栏点击事件
+            ShoppingCart_count(); //购物车数量显示
+			$("#btnSearch").click(function () {
+                startProductQuery(); //搜索点击事件
+            }) ;
+            addCart();  //加入购物车点击事件
+
+            //进入购物车点击事件
+            $("#carthref").on("click",function () {
+					$.ajax({
+						type:"get",
+						data:{"action":"verifyLogin"},
+						url:"/verifyLoginServlet",
+						success:function (data) {
+							if(data.msg === "false"){  //未登入
+                                $("#loginhref").click();  //弹出登入框
+							}else{
+							    location.href="cart.html"; //跳转网页
+							}
+                        },
+						error:function (xhl) {
+							console.log(xhl);
+                        }
+					});
+            });
+
+			// 获得已登入的用户
+            $.ajax({
+                type:"post",
+                data:{"action":"select"},
+                url:"/userServlet",
+                success:function (data) {
+                    if(data.msg != "false"){  //有用户登入
+                        $("#showUser").text(data.msg);
+					}
+                },
+                error:function (xhl) {
+                    console.log(xhl);
+                }
+            });
+
+
+        });
+
+		//商品展示加入购物车按钮点击事件
+        function addCart(){
+            $("#showProduct").on("click",".addCart",function () {
+                    $.ajax({
+                       type:"get",
+                       data:{"action":"add","c_p_id":$(this).attr("value"),"c_count":1},
+                       url:"/verify/shoppingCartServlet",
+                       success:function (data) {
+                           if(data.msg === "false"){  //未登入
+                               $("#loginhref").click();  //弹出登入框
+						   }else{
+                               alert(data.msg);
+                               ShoppingCart_count();
+						   }
+                       } ,
+                        error:function (xhl) {
+                            console.log(xhl);
+                        }
+                    });
+            });
+        }
+
+        //获得购物车的待购买数量
+		function ShoppingCart_count(){
+            $.ajax({
+				type:"get",
+				data:{"action":"getCount"},
+				url:"/verify/shoppingCartServlet",
+				success:function (data) {
+					$("#CountMessage").text(data.count);
+                }
+                ,error:function (xhl) {
+					console.log(xhl);
+                }
+			});
+		}
+
+
+		function  startProductQuery(){
+            var term = $("#txtSearch").val();
+            if(term == null || term == ""){
+                term = "term";
+            }
+
+            $.ajax({
+                type:"get",
+                data:{"action":"queryAll","term":term},
+                url:"/productServlet",
+                success:function (data) {
+                    var html = "";
+                    $.each(data,function (index,obj) {
+                        html += "<div class='col-md-4'>";
+                        html += "   <div class='thumbnail'>";
+                        html += "   <img alt='300x300' src='../"+obj.p_photo+"'/>";
+                        html += "   <div class='caption'>";
+                        html += "   <h3 style='color: red; font-weight: bold;'>￥"+obj.p_price+"</h3>";
+                        html += "<p>";
+                        html += obj.p_name;
+                        html += "</p>";
+                        html += "<p>";
+                        html += "<a class='btn btn-primary addCart' value='"+obj.p_id+"' href='#'>加入购物车</a>";
+                        html += "   </p>";
+                        html += "   </div>";
+                        html += "   </div>";
+                        html += "   </div>";
+                    });
+                    $("#showProduct").html(html);
+                },
+                error(xhl){
+                    console.log(xhl);
+                }
+            });
+		};
+
+
+		function startLeftNvaQuery() {
+			$.ajax({
+				type: "get",
+				data: {"action": "queryAll"},
+				url: "/typeServlet",
+				success: function (data) {
+					$.each(data, function (index, obj) {
+						var a = $("<a href='#' value='"+obj.t_id+"' class='query_t_id' >" + obj.t_name + "</a>");
+						var li = $("<li/>").prop("class", "nav");
+						li.append(a);
+						$("#ul_Type").append(li);
+
+					});
+				},
+				error(xhl) {
+					console.log(xhl);
+				}
+			});
+        }
+
+        function left_nva_a_click(){
+			//导航栏a标签点击事件
+            $("#ul_Type").on("click",".query_t_id",function(){
+                $.ajax({
+                    type:"get",
+                    data:{"action":"queryByT_Id","p_t_id":$(this).attr("value")},
+                    url:"/productServlet",
+                    success:function (data) {
+                        var html = "";
+                        $.each(data,function (index,obj) {
+                            html += "<div class='col-md-4'>";
+                            html += "   <div class='thumbnail'>";
+                            html += "   <img alt='300x300' src='../"+obj.p_photo+"'/>";
+                            html += "   <div class='caption'>";
+                            html += "   <h3 style='color: red; font-weight: bold;'>￥"+obj.p_price+"</h3>";
+                            html += "<p>";
+                            html += obj.p_name;
+                            html += "</p>";
+                            html += "<p>";
+                            html += "<a class='btn btn-primary addCart' value='"+obj.p_id+"' href='#'>加入购物车</a>";
+                            html += "   </p>";
+                            html += "   </div>";
+                            html += "   </div>";
+                            html += "   </div>";
+                        });
+                        $("#showProduct").html(html);
+                    },
+                    error(xhl){
+                        console.log(xhl);
+                    }
+                });
+            });
+        }
+
+
+	</script>
+</html>

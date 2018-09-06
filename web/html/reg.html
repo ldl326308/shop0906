@@ -1,0 +1,35 @@
+<div id="regModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document" style="width: 30%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title">用户注册</h3>
+      </div>
+      <div class="modal-body">
+      	<div class="row" style="margin: 1rem;">
+      		<div class="col-md-12">
+      			<form class="form-horizontal" role="form">
+					<div class="form-group">
+						<input type="text" class="form-control" style="ime-mode:disabled" onkeyup="value=value.replace(/[^0-9a-zA-z]/g,'')" autocomplete="off" id="user_id"  placeholder="账号"/>
+					</div>
+					<div class="form-group">
+						<input type="password"  onkeyup="value=value.replace(/[^0-9a-zA-z]/g,'')" class="form-control" autocomplete="off" id="user_pwd" placeholder="密码"/>
+					</div>
+					<div class="form-group">
+						<input type="tel"  onkeyup="value=value.replace(/[^0-9]/g,'')" maxlength="11" class="form-control" id="user_phone" autocomplete="off" placeholder="手机"/>
+					</div>
+					<div class="form-group">
+						<input type="email"  onkeyup="value=value.replace(/[^0-9a-zA-z_.@]/g,'')" class="form-control" autocomplete="off" id="user_email" placeholder="邮箱"/>
+					</div>
+				</form>
+      		</div>
+      	</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" id="btnRegister" class="btn btn-primary">注册</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+

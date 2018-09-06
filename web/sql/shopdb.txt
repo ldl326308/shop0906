@@ -1,0 +1,201 @@
+-- MySQL dump 10.13  Distrib 8.0.12, for Win64 (x86_64)
+--
+-- Host: localhost    Database: shopdb
+-- ------------------------------------------------------
+-- Server version	8.0.12
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+ SET NAMES utf8mb4 ;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `address`
+--
+
+DROP TABLE IF EXISTS `address`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `address` (
+  `a_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `a_u_id` int(11) NOT NULL COMMENT '用户id',
+  `a_name` varchar(20) NOT NULL COMMENT '收货人姓名',
+  `a_phone` varchar(11) NOT NULL COMMENT '收货人联系电话',
+  `a_address` varchar(50) NOT NULL COMMENT '收货地址',
+  PRIMARY KEY (`a_id`),
+  KEY `FK_Address_User` (`a_u_id`),
+  CONSTRAINT `FK_Address_User` FOREIGN KEY (`a_u_id`) REFERENCES `user` (`u_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `address`
+--
+
+LOCK TABLES `address` WRITE;
+/*!40000 ALTER TABLE `address` DISABLE KEYS */;
+INSERT INTO `address` VALUES (1,1,'刘大仙','13718071824','广东珠海斗门白蕉镇南路29号'),(2,1,'张大仙','13789371824','湖南长沙朝阳区千里路20号'),(3,1,'RngUZI','13345071824','江西赣州于都100中'),(4,5,'刘地林','13817098976','江西赣州于都县');
+/*!40000 ALTER TABLE `address` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `order`
+--
+
+DROP TABLE IF EXISTS `order`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `order` (
+  `o_id` varchar(150) NOT NULL COMMENT '订单id',
+  `o_a_id` int(11) DEFAULT NULL COMMENT '收货地址id',
+  `o_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单时间',
+  PRIMARY KEY (`o_id`),
+  KEY `FK_Order_Address` (`o_a_id`),
+  CONSTRAINT `FK_Order_Address` FOREIGN KEY (`o_a_id`) REFERENCES `address` (`a_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order`
+--
+
+LOCK TABLES `order` WRITE;
+/*!40000 ALTER TABLE `order` DISABLE KEYS */;
+INSERT INTO `order` VALUES ('deb2c72d-9a6b-4973-ac49-e9b1f6a755b7',4,'2018-09-04 11:55:29');
+/*!40000 ALTER TABLE `order` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `product`
+--
+
+DROP TABLE IF EXISTS `product`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `product` (
+  `p_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '商品id',
+  `p_t_id` int(11) NOT NULL COMMENT '商品类型',
+  `p_name` varchar(700) DEFAULT NULL COMMENT '商品名称',
+  `p_price` decimal(10,2) NOT NULL COMMENT '商品价格',
+  `p_photo` varchar(1000) DEFAULT NULL COMMENT '图片路径',
+  `p_state` int(11) DEFAULT '0' COMMENT '状态',
+  PRIMARY KEY (`p_id`),
+  KEY `FK_product_type` (`p_t_id`),
+  CONSTRAINT `FK_product_type` FOREIGN KEY (`p_t_id`) REFERENCES `type` (`t_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `product`
+--
+
+LOCK TABLES `product` WRITE;
+/*!40000 ALTER TABLE `product` DISABLE KEYS */;
+INSERT INTO `product` VALUES (1,1,'联想(Lenovo)330C15.6英寸商务娱乐影音笔记本电脑(i7-8550U 4G 1T+128G MX110 2G FHD Office2016)黑',4999.00,'images/2b5a7b43-b18d-43b6-a690-ae9f6dcae1e6.jpg',0),(2,1,'小米(MI)Air 13.3英寸全金属超轻薄笔记本电脑(i5-8250U 8G 256GSSD 集显 预装Office 指纹版)银',4999.00,'images/a6424b9d-e67a-4e41-a3b3-4e7c8a8ad690.jpg',0),(3,1,'荣耀MagicBook 14英寸轻薄窄边框笔记本电脑（i7-8550U 8G 256G MX150 2G独显 FHD IPS 正版Office）冰河银',5999.00,'images/6a930885-e8fa-4e93-8e47-766bb7aa44cc.jpg',0),(4,2,'荣耀9i 4GB+64GB 幻夜黑 移动联通电信4G全面屏手机 双卡双待',1499.00,'images/cdc81e9a-102e-4940-81ed-5b555ef854d5.jpg',0),(5,2,'一加手机6 8GB+128GB 琥珀红 全面屏双摄游戏手机 全网通4G 双卡双待',3599.00,'images/a6806753-059e-4d51-a1c0-7f26b9f5a685.jpg',0),(6,2,'Apple iPhone 8 (A1863) 256GB 银色 移动联通电信4G手机',5999.00,'images/1c150088-52b0-4504-b388-7cdf4960d7b7.jpg',0),(7,3,'利仁（Liven）多用途锅多功能家用电火锅 不粘电炒锅电热锅电煮锅 京东自营小家电DHG-40FK',109.00,'images/d33f0021-0d92-4b04-9312-b925e1831010.jpg',0),(8,3,'LG 7公斤DD变频直驱全自动滚筒洗衣机 450mm纤薄机身 智能手洗 静音 奢华白 WD-L51HNG20',2549.00,'images/e1aa4475-1e80-43bb-82e1-c4d26af93cbe.jpg',0),(9,3,'LG 55LG63CJ-CA 55英寸超高清4K IPS硬屏主动式HDR 智能平板液晶电视机（黑色）',3688.00,'images/8e971819-1f7c-48ce-b118-78a8a381c62e.jpg',0),(10,3,'TCL 65A860U 65英寸32核人工智能 超智慧 超薄4K 超高清电视机（银色）',4999.00,'images/0a231feb-ae0b-4c57-91a6-6f2bf6826633.jpg',0),(11,11,'TEEK长袖T恤男2018秋冬新品 休闲衣服体恤男装加绒上衣打底衫 【不加绒】T708浅蓝色 175/96(L码)',89.00,'images/00dfcdb5-1a5f-4ef9-8684-0ffeec5c8057.jpg',0),(12,11,'唐狮纯色短袖t恤男圆领夏季体恤纯棉半袖花纱衣服韩版男装打底衫 深麻灰（B款/棉汗布） M',69.00,'images/aaf85d0d-f380-44ac-9efc-dd8bfb176d61.jpg',0),(13,11,'UYUK短袖T恤男士卫衣2018夏季冰爽新款帅气韩版五分连帽半袖韩版修身时尚休闲打底衫中袖大码男装 81灰色 L',88.00,'images/1c1ba6ba-88ec-4a61-b9a7-22bc21557b3e.jpg',0),(14,11,'子牧棉麻2018夏季新款 女新品 民族风女装印花宽松长款短袖复古盘扣连衣裙3008 蓝黄花 L建议（130斤以内）',159.00,'images/fc39af9e-8384-4041-87e1-b82075a2af9f.jpg',0),(15,11,'婪澈长袖连衣裙2018秋季新款两件套套装裙时尚套装女春针织大码女装韩版雪纺女沙滩裙子 白衣+黑背心 L',149.00,'images/93725a60-e7d0-4df1-9072-3d9393a14aba.jpg',0),(16,11,' 夏季连衣裙短袖2018套装裙套装女春真丝性感大码女装韩版雪纺夏季新款女沙滩裙子',124.20,'images/001c5b18-aaf9-41ad-8d7e-aebf98cda368.jpg',0),(17,6,'乐事（Lay’s）无限薯片 休闲零食 104g*3组合装（原味+烤肉+番茄）百事食品',19.90,'images/38544c08-a6ea-453a-87c9-aed3e0722d6b.jpg',0),(18,6,'奥利奥Oreo早餐休闲零食蛋糕糕点缤纷双果味夹心饼干蓝莓味+树莓味388g',22.90,'images/b345b941-f8a6-4681-b5be-9f2572a9c00a.jpg',0),(19,6,'三只松鼠休闲零食网红食品黄山特产梅干菜扣肉酥烧饼蟹壳黄烧饼150g',16.90,'images/82ab6d30-3190-411a-a4ba-a38aa0eb8e83.jpg',0),(20,6,'良品铺子 鹌鹑蛋 卤蛋 香卤蛋 零食小吃 卤味熟食真空128g',16.90,'images/86232f55-4a02-4095-817e-0ad6de848d1b.jpg',0),(21,1,'戴尔DELL游匣G3烈焰版 15.6英寸游戏笔记本电脑(i5-8300H 8G 128GSSD 1T GTX1050Ti 4G独显 IPS)',5999.00,'images/8bcca82e-1554-4b5a-bf1b-c65c16cd7031.jpg',0),(22,7,'可得优（KW-triO） 桌面办公文件筐三联文件框三列杂志框办公文件架资料架',31.70,'images/4575cf63-6b11-4642-95d3-94d03a363113.jpg',0),(23,7,'广博(GuangBo)稳固型四联文件栏/文件筐/文件架办公用品 蓝WJK9399',9.90,'images/983de259-879a-446b-8025-2d68718e2049.jpg',0),(24,7,'得力(deli)金属网纹圆形笔筒 简约创意桌面收纳 黑色9172',6.50,'images/62299d9a-cef6-4cd5-a28f-3ff3e5246061.jpg',0),(25,5,'特步（XTEP） 特步男鞋跑步鞋轻便耐磨运动鞋男士休闲皮鞋透气鞋子夏季款减震慢跑鞋 黑桔/飞织 43',169.00,'images/76bafa7b-f651-4500-a0ee-15daea15c060.jpg',0),(26,5,'【赞商品】李宁 LI-NING 耐磨PU材质篮球室内外兼用CBA联赛官方比赛蓝球lanqiu 443-1',79.00,'images/1971e5fd-8b72-42a4-8aa3-f304cddb7ad3.jpg',0),(27,5,'【买一送五】中国李宁篮球水泥地耐磨PU室内外篮球 训练比赛7号成人蓝球韦德之道纪念版DWADE篮球 韦德之道纪念版篮球（黑色）',159.00,'images/265e3df7-39c2-461e-8954-a5dac90b3fcd.jpg',0),(28,6,'良品铺子酥脆薄饼薄脆海苔咸饼干 盒装咸味零食小吃早餐休闲食品300g',9.90,'images/3c9cff8c-f874-41ad-a222-9c82df60a847.jpg',0);
+/*!40000 ALTER TABLE `product` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `shoppingcart`
+--
+
+DROP TABLE IF EXISTS `shoppingcart`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `shoppingcart` (
+  `c_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '购物车id',
+  `c_u_id` int(11) NOT NULL COMMENT '用户id',
+  `c_p_id` int(11) NOT NULL COMMENT '商品id(唯一约束)',
+  `c_o_id` varchar(150) DEFAULT NULL COMMENT '订单id',
+  `c_count` int(11) NOT NULL COMMENT '数量',
+  `c_state` int(11) DEFAULT '0' COMMENT '状态',
+  PRIMARY KEY (`c_id`),
+  KEY `FK_ShoppingCart_User` (`c_u_id`),
+  KEY `FK_ShoppingCart_Product` (`c_p_id`),
+  KEY `FK_ShoppingCart_Order` (`c_o_id`),
+  CONSTRAINT `FK_ShoppingCart_Order` FOREIGN KEY (`c_o_id`) REFERENCES `order` (`o_id`),
+  CONSTRAINT `FK_ShoppingCart_Product` FOREIGN KEY (`c_p_id`) REFERENCES `product` (`p_id`),
+  CONSTRAINT `FK_ShoppingCart_User` FOREIGN KEY (`c_u_id`) REFERENCES `user` (`u_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `shoppingcart`
+--
+
+LOCK TABLES `shoppingcart` WRITE;
+/*!40000 ALTER TABLE `shoppingcart` DISABLE KEYS */;
+INSERT INTO `shoppingcart` VALUES (1,5,1,NULL,1,0),(2,5,2,'deb2c72d-9a6b-4973-ac49-e9b1f6a755b7',1,1);
+/*!40000 ALTER TABLE `shoppingcart` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `type`
+--
+
+DROP TABLE IF EXISTS `type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `type` (
+  `t_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '类型id',
+  `t_name` varchar(15) NOT NULL COMMENT '类型名称',
+  PRIMARY KEY (`t_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `type`
+--
+
+LOCK TABLES `type` WRITE;
+/*!40000 ALTER TABLE `type` DISABLE KEYS */;
+INSERT INTO `type` VALUES (1,'电脑'),(2,'手机'),(3,'家电'),(4,'家具'),(5,'运动'),(6,'食品'),(7,'办公'),(8,'汽车'),(9,'珠宝'),(10,'玩具'),(11,'服装');
+/*!40000 ALTER TABLE `type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `user` (
+  `u_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户id',
+  `user_id` varchar(20) NOT NULL COMMENT '登入账号',
+  `user_pwd` varchar(20) NOT NULL COMMENT '登入密码',
+  `user_phone` varchar(11) NOT NULL COMMENT '联系电话',
+  `user_email` varchar(20) NOT NULL COMMENT '用户邮箱',
+  PRIMARY KEY (`u_id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  UNIQUE KEY `user_phone` (`user_phone`),
+  UNIQUE KEY `user_email` (`user_email`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user`
+--
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'oudaxian','oudaxian123','13676869098','32699833@qq.com'),(2,'liudaxian','liudaxian123','13634869098','32434833@qq.com'),(3,'zhangdaxian','zhangdaxian123','13679656098','326242833@qq.com'),(4,'tangdaxian','tangdaxian123','13678775098','326252533@qq.com'),(5,'ldl','123','123455556','32625552533@qq.com');
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-09-04 20:24:57

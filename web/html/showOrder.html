@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单显示</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../css/ext.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="row box" style="margin-bottom: 2rem; margin-top: 2rem;">
+            <div class="col-md-10 column">
+                <h1 style="color: red; margin: auto;">订单显示</h1>
+            </div>
+            <div class="col-md-2 column" align="right">
+                <a href="index.html">返回首页</a>
+            </div>
+        </div>
+    </div>
+        <!-- 订单信息展示 -->
+    <table style="text-align: center;" class="table table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">序号</th>
+            <th scope="col">订单号</th>
+            <th scope="col">商品名称</th>
+            <th scope="col">单价</th>
+            <th scope="col">数量</th>
+            <th scope="col">下单时间</th>
+            <th scope="col">收货地址</th>
+            <th scope="col">金额</th>
+        </tr>
+        </thead>
+        <tbody id="showOrder">
+        </tbody>
+    </table>
+
+<script src="../js/jquery-3.3.1.min.js"></script>
+<script src="../js/operation.js"></script>
+<script>
+    $(function () {
+        //页面加载完成，渲染订单数据
+        $.ajax({
+            type:"get",
+            data:{"action":"query"},
+            url:"/showOrderServlet",
+            success:function (data) {
+                //序号、订单号、商品名称、单价、数量、下单时间、金额、总金额
+                //String o_id, String p_name, BigDecimal p_price, int c_count, Date o_time, String a_address
+                var html ="";
+                $.each(data,function (index,obj) {
+                    html += " <tr> ";
+                    html += "    <td>"+(index+1)+"</td> ";
+                    html += "    <td>"+obj.o_id+"</td> ";
+                    html += "    <td>"+obj.p_name+"</td> ";
+                    html += "    <td>"+obj.p_price+"</td> ";
+                    html += "    <td>"+obj.c_count+"</td> ";
+                    html += "    <td>"+obj.o_time+"</td> ";
+                    html += "    <td>"+obj.a_address+"</td> ";
+                    html += "    <td>"+accMul(obj.c_count,obj.p_price)+"</td> ";
+                    html += "    </tr> ";
+                });
+
+                $("#showOrder").html(html);
+
+            } ,
+            error:function (xhl) {
+                console.log(xhl);
+            }
+        });
+
+    });
+
+
+</script>
+</body>
+</html>

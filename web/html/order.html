@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>确认订单</title>
+		<link rel="stylesheet" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../css/ext.css" />
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="row box" style="margin-bottom: 2rem; margin-top: 2rem;">
+				<div class="col-md-10 column">
+					<h1 style="color: red; margin: auto;">确认订单</h1>
+				</div>
+				<div class="col-md-2 column" align="right">
+					<a href="index.html">返回首页</a>
+				</div>
+			</div>
+			<!-- 地址信息-->
+			<div class="row" style="margin-bottom: 2rem;">
+				<div class="col-md-12 column">
+					<ul id="ulAddress" class="nav navcolor nav-pills nav-stacked">
+						<li class="active" style="font-size: large;">
+							<a href="#">配送地址</a>
+						</li>
+						<!--<li>-->
+							<!--<input type="radio" name="address"/>&nbsp; 江西省赣州市什么路153号(张三 收) 15818876898-->
+						<!--</li>-->
+						<!--<li>-->
+							<!--<input type="radio" name="address"/>&nbsp; 广东省广州市天河区什么路121号(李四 收) 18777890986 -->
+						<!--</li>-->
+						<!--<li>-->
+							<!--<input type="radio" name="address"/>&nbsp; 广东省珠海市香洲区什么路101号(王五 收) 13043709878-->
+						<!--</li>-->
+						<li>
+							<input type="button" id="newaddr" class="btn btn-info btn-sm" value="使用新地址"/>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- 订单信息 -->
+			<div class="row" style="margin-bottom: 2rem;">
+				<div class="col-md-12 column">
+					<ul class="nav navcolor nav-pills nav-stacked">
+						<li class="active" style="font-size: large;">
+							<a href="#">订单信息</a>
+						</li>
+						<li>
+							<div class="row">
+								<div class="col-md-1 column" align="left"></div>
+								<div class="col-md-3 column" align="left">商品信息</div>
+								<div class="col-md-3 column" align="left">单价</div>
+								<div class="col-md-2 column" align="left">数量</div>
+								<div class="col-md-3 column" align="left">金额</div>
+							</div>
+						</li>
+							<div id="divOrder"></div>
+
+						<!--<li>-->
+							<!--<div class="row box">-->
+								<!--<div class="col-md-1 column" align="left">-->
+									<!--<img alt="60x60" style="margin: 1rem;" width="60rem" height="60rem" src="https://g-search2.alicdn.com/img/bao/uploaded/i4/i4/112417306/TB2A6YsjhGYBuNjy0FnXXX5lpXa_!!112417306.jpg_460x460Q90.jpg_.webp" />-->
+								<!--</div>-->
+								<!--<div class="col-md-3 column" align="left">-->
+									<!--<p>-->
+										<!--2017新款27寸5K苹果/Apple iMac Pro一体机台式电脑MQ2Y2CH/A定制-->
+									<!--</p>-->
+								<!--</div>-->
+								<!--<div class="col-md-3 column" align="left">-->
+									<!--<p style="font-size: large;">¥ 33580.00</p>-->
+								<!--</div>-->
+								<!--<div class="col-md-2 column" align="left">-->
+									<!--<p style="font-size: large;">1</p>-->
+								<!--</div>-->
+								<!--<div class="col-md-3 column" align="left">-->
+									<!--<p style="color: red; font-size: large;">¥ 33580.00</p>-->
+								<!--</div>-->
+							<!--</div>-->
+						<!--</li>-->
+					</ul>
+				</div>
+			</div>
+			<!-- 结算 -->
+			<div class="row">
+				<div class="col-md-12 column" align="right" style="margin-top: 1rem;">
+					<p style="color: red; font-size: large; font-weight: bold;">实付款：¥ <span id="num_price">0.00</span></p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12 column" align="right">
+					<input type="button" id="suborder" class="btn btn-primary btn-lg" value="提交订单" />
+				</div>
+			</div>
+		</div>
+		<!-- 模式对话框 -->
+		<div id="addrModal"></div>
+	</body>
+	<script src="../js/jquery-3.3.1.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script src="../js/operation.js"></script>
+	<script>
+		$(function(){
+			$("#newaddr").on("click",function(){
+				$("#addrModal").load("newaddr.html",function(){
+					$("#newAddrModal").modal('show');
+					//注册事件
+					$("#btn_add_address").on("click",function () {
+                        var name = $("#receiveUser").val();
+                        var phone = $("#receiveTell").val();
+                        var address = $("#receiveAddr").val();
+                        $.ajax({
+                            type:"get",
+                            data:{"action":"add","name":name,"phone":phone,"address":address},
+                            url:"/addressServlet",
+                            success:function (data) {
+                                alert("添加成功-_-！");
+                                rendering_address(); //重新渲染地址
+                                $("#newAddrModal").modal('hide');
+                            },
+                            error:function (xhl) {
+                                console.log(xhl);
+                            }
+                        });
+                    });
+				});
+			});
+
+			$("#suborder").on("click",function(){
+				//alert("在数据生成订单记录，并更新相应的购物项关联此订单\n，并修改购物项记录的状态为已下单");
+				//获得地址信息 生成订单  将此处数据状态改为 1(已购买)  关联产生的订单编号
+				var address = $("input[type=radio]:checked").prop("id");
+				if(address =="" || address == undefined){
+				    alert("请选择收货地址");
+				    return;
+				}
+				console.log("地址a_id:"+address);
+				$.ajax({
+					type:"get",
+					data:{"action":"add","a_id":address},
+					url:"/orderServlet",
+					success:function (data) {
+							alert(data.msg);
+							//网页跳转
+						location.href="showOrder.html";
+                    },
+					error:function (xhl) {
+						console.log(xhl);
+                    }
+				});
+			});
+
+
+		});
+
+
+		$(function () {
+			//收货地址渲染
+			rendering_address();
+			//订单信息渲染
+            rendering_order();
+        });
+
+		//总价格计算
+		function count_Price(){
+		    //获得购物车id
+			var lis = $("#divOrder li");
+			var term = "";
+            var str = "";
+            for (var i = 0; i < lis.length; i++) {
+                term += str + $(lis[i]).prop("id");
+                str = ",";
+            }
+            console.log("此页面商品所在购物车c_id："+term);
+
+            $.ajax({
+                type:"get",
+                data:{"action":"price_num","condition":term},
+                url:"/product_CartServlet",
+                success:function (data) {
+                    var price_num =0.00 ;
+                    $.each(data,function (index,obj) {
+                        price_num = accAdd(price_num,accMul(obj.p_price,obj.c_count));
+                    });
+                    $("#num_price").text("合计：¥ "+price_num);
+                },
+                error:function (xhl) {
+                    console.log(xhl);
+                }
+            });
+		}
+
+
+		//渲染订单信息
+		function rendering_order(){
+		    $.ajax({
+				type:"get",
+				data:{"action":"order"},
+				url:"/product_CartServlet",
+				success:function (data) {  //待结算的订单渲染
+				    //   int c_id, String p_name, int c_count, BigDecimal p_price, String p_photo
+					var html ="";
+					$.each(data,function (index,obj) {
+                    	html += "<li id='"+obj.c_id+"'>";
+                        html += "<div class='row box'>";
+                        html += "   <div class='col-md-1 column' align='left'>";
+                        html += "   <img alt='60x60' style='margin: 1rem;' width='60rem' height='60rem' src='../"+obj.p_photo+"' />";
+						html += "   </div>";
+                        html += "   <div class='col-md-3 column' align='left'>";
+                        html += "   <p>";
+                        html += obj.p_name;
+                        html += " </p></div>";
+                        html += "<div class='col-md-3 column' align='left'>";
+                        html += "  <p style='font-size: large;'>¥   "+obj.p_price+"</p>   " ;
+						html +=	"  </div><div class='col-md-2 column' align='left'>";
+                        html += "   <p style='font-size: large;'>"+obj.c_count+"</p>";
+                        html += "   </div>";
+                        html += "   <div class='col-md-3 column' align='left'>";
+                        html += "    <p style='color: red; font-size: large;'>¥ "+(obj.p_price*obj.c_count)+"</p>";
+                        html += " </div>";
+                        html += " </div>";
+                        html += " </li>";
+                    });
+					$("#divOrder").html(html);
+
+
+                    //总价计算
+                    count_Price();
+
+                },
+				error:function (xhl) {
+					console.log(xhl);
+                }
+			});
+		}
+
+		function rendering_address(){
+		    $.ajax({
+				type:"get",
+				data:{"action":"queryAll"},
+				url:"/addressServlet",
+				success:function (data) {
+				    //<li>
+                    // <input type="radio" name="address"/>&nbsp; 江西省赣州市什么路153号(张三 收) 15818876898
+                    // </li>
+					//清空一下   int a_id, int a_u_id, String a_name, String a_phone, String a_address
+					$("#ulAddress li[name=uzi]").remove();
+					var html ="";
+				    $.each(data,function (index,obj) {
+                        html+="<li name='uzi'>";
+                        html+="<input name='cboAdr' id='"+obj.a_id+"' type='radio'/>&nbsp;"+obj.a_address+"("+obj.a_name+"  收)"+obj.a_phone;
+                        html+="</li>";
+                    });
+                    $("#ulAddress").append(html);
+
+                    //默认选中第一个当选按钮
+                    var rads = $("input[type=radio]");
+                    rads[0].checked = true;
+
+                },
+				error:function (xhl) {
+					console.log(xhl);
+                }
+			});
+		}
+
+
+	</script>
+</html>
